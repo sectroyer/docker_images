@@ -4,12 +4,13 @@ source color.sh
 
 if [ -z "$1" ]
 then
-	echo "Usage: <http[s]://server/path/javax.faces.resource/[folder/]file.jsf"
+	echo "Usage: <http[s]://server/path/javax.faces.resource/[folder/]file.jsf [<optional_cookie_value>]"
 	exit -1
 fi
+mycookie=""
 
 function check_url(){
-	curl -i -v -k "$1" -s 2>&1  |grep "^HTTP" | grep 200 -q
+	curl -b "Cookie: $mycookie" -i -v -k "$1" -s 2>&1  |grep "^HTTP" | grep 200 -q
 	if [ $? -eq 0 ]
 	then
 		printgn "YES"
@@ -58,14 +59,19 @@ fi
 
 echo ""
 qprint "Checking if we are dealing with Apache MyFaces..."
-myfaces_url="$jsfurl?ln"
-check_url "$myfaces_url"
-is_myfaces=$?
-if [ $is_myfaces -eq 0 ]
+myfaces_url="$jsfurl?ln=."
+check_url "$myfaces_url" &>/dev/null
+does_dot_work=$?
+myfaces_url="$jsfurl?ln=./."
+check_url "$myfaces_url" &> /dev/null
+does_dot_slash_work=$?
+if [ $does_dot_work -eq 0 ] && [ $does_dot_slash_work -ne 0 ]
 then
+	printgn "YES"
 	echo -e  "Apache MyFaces detected...\n"
 	exit 0
 fi
+printrn "NO"
 
 echo -e "\nMojarra detected :)\n"
 
