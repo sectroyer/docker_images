@@ -57,6 +57,14 @@ then
 	fi
 fi
 
+jsf_base=$(echo "$jsfurl" | grep ".*javax.faces.resource/" -o)
+
+echo -e "\nJSF Base: $jsf_base\n"
+
+qprint "Checking if jsf.js exists..."
+myjs_url="${jsf_base}jsf.js.jsf?ln=javax.faces"
+check_url "$myjs_url"
+
 echo ""
 qprint "Checking if we are dealing with Apache MyFaces..."
 myfaces_url="$jsfurl?ln=."
@@ -75,12 +83,23 @@ printrn "NO"
 
 echo -e "\nMojarra detected :)\n"
 
+qprint "Checking if Mojarra version is 2.3.0 or higher..."
+myjs_url="${jsf_base}jsf.js.jsf?loc=javax.faces"
+check_url "$myjs_url"
+is_2_3=$?
+
+echo "" 
 qprint "Checking if Mojarra version is in range 2.3.0-2.3.13..."
 mojarra_url="${jsfurl/resource/resource\/resources}?loc=./.."
 check_url "$mojarra_url"
 if [ $? -ne 0 ]
 then
-	echo -e "\nMojarra version higher than 2.3.13 or lower than 2.3.0 :(\n"
+	if [ $is_2_3 -eq 0 ]
+	then
+		echo -e "\nMojarra version is higher than 2.3.13 :(\n"
+	else
+		echo -e "\nMojarra version is higher than 2.3.13 or lower than 2.3.0 :(\n"
+	fi
 else
 	echo -e "\nMojarra version is in range 2.3.0-2.3.13 :D\n"
 	exit 0
@@ -91,7 +110,7 @@ mojarra_url="$jsfurl?ln=."
 check_url "$mojarra_url"
 if [ $? -ne 0 ]
 then
-	echo -e "\nMojarra version higher than 2.2.6\n"
+	echo -e "\nMojarra version is higher than 2.2.6\n"
 	exit -1
 fi
 	
@@ -102,7 +121,7 @@ mojarra_url="${jsfurl/resource/resource\/resources}?ln=./.."
 check_url "$mojarra_url"
 if [ $? -ne 0 ]
 then
-	echo -e "\nMojarra version higher than 2.2.4 :)\n"
+	echo -e "\nMojarra version is higher than 2.2.4 :)\n"
 	exit 0 
 fi
 	
