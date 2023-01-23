@@ -7,10 +7,15 @@ then
 	echo "Usage: <http[s]://server/path/javax.faces.resource/[folder/]file.jsf [<optional_cookie_value>]"
 	exit -1
 fi
+
 mycookie=""
+if [ -n "$2" ]
+then
+	mycookie="$2"
+fi
 
 function check_url(){
-	curl -b "Cookie: $mycookie" -i -v -k "$1" -s 2>&1  |grep "^HTTP" | grep 200 -q
+	curl -b "$mycookie" -i -v -k "$1" -s 2>&1  |grep "^HTTP" | grep 200 -q
 	if [ $? -eq 0 ]
 	then
 		printgn "YES"
