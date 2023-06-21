@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 import requests
 import sys, re
+from urllib3.exceptions import InsecureRequestWarning
+
+# Disable the InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 RED = "\033[0;31m"
 GREEN = "\033[0;32m"

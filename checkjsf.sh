@@ -26,7 +26,7 @@ function check_url(){
 	return 1
 }
 function qprint(){
-	printf "%-60s" "$1"
+	printf "%-90s" "$1"
 }
 jsfurl="$1"
 
